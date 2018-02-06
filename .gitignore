@@ -3,4 +3,9 @@ target
 .classpath
 .settings
 bin/
+pkg/
+
+src/github.com/
+src/golang.org/
+
 *~
