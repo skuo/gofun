@@ -58,7 +58,6 @@ func tryNummap() {
 		os.Exit(1)
 	}
 	fmt.Println("Created numers data file", numbersFile, "OK.")
-
 }
 
 func tryGoto() {
@@ -100,11 +99,41 @@ func tryCurr() {
 	if util.AssertEuro(curr1) {
 		fmt.Println(curr1, "is Euro")
 	}
-	
+
 	// sort, defer shuffle, print
 	util.Sort()
 	util.Print()
 	util.Print()
+}
+
+func tryPtr() {
+	fmt.Printf("\b\n--- tryPtr() ---\n")
+	// new pointer
+	intptr := new(int)
+	*intptr = 44
+
+	p := new(struct{ first, last string })
+	p.first = "Samuel"
+	p.last = "Pierre"
+
+	fmt.Printf("Value %d, type %T\n", *intptr, intptr)
+	fmt.Printf("Person %+v, type %T\n", p, p)
+}
+
+func tryShape() {
+	fmt.Printf("\b\n--- tryShape() ---\n")
+    // Circle
+    c := util.Circle{0,0,5}
+    fmt.Printf("Area of circle=%f\n", c.Area());
+    // Rectangle
+    r := util.Rectangle{0,0,10,10}
+    fmt.Printf("Area of rectangle=%f\n", r.Area());
+    // Shape
+    fmt.Printf("Total area of circle and rectangle=%f\n", util.TotalArea(&c, &r))
+    // MultiShape
+    r2 := util.Rectangle{0, 0, 5, 5}
+    ms := util.MultiShape{ []util.Shape{&c, &r, &r2} }
+    fmt.Printf("Area of a MultiShape consists of a circle and two rectangles=%f\n", ms.Area())   
 }
 
 func main() {
@@ -113,4 +142,6 @@ func main() {
 	tryNummap()
 	tryGoto()
 	tryCurr()
+	tryPtr()
+	tryShape()
 }
