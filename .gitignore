@@ -4,6 +4,7 @@ target
 .settings
 bin/
 pkg/
+output/
 
 src/github.com/
 src/golang.org/

@@ -1,12 +1,12 @@
 package constant
 
 import (
-    "testing"
+	"testing"
 )
 
 func TestConstant(t *testing.T) {
-    
-    cases := []struct {
+
+	cases := []struct {
 		in, want int32
 	}{
 		{2, StarHyperGiant},
@@ -21,10 +21,10 @@ func TestConstant(t *testing.T) {
 		{2048, StarBrownDwarf},
 	}
 
-    for _, c := range cases {
-        if c.in != c.want {
-            t.Fail()
-        }
-            
-    }
+	for _, c := range cases {
+		if c.in != c.want {
+			t.Fail()
+		}
+
+	}
 }
