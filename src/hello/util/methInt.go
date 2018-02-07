@@ -163,10 +163,17 @@ type food interface {
 	eat()
 }
 
+type plant interface {
+    color()    
+}
+
 type veggie string
 
 func (v veggie) eat() {
 	fmt.Println("Eating", v)
+}
+func (v veggie) color() {
+    fmt.Println("Multiple colors", v)
 }
 
 type meat string
@@ -203,7 +210,22 @@ func tryInterface() {
 	eat(meat("lamb"))
 	eat(veggie("okra"))
 	eat(meat("beef"))
-
+	
+	// check the interface type
+	cabbage := veggie("cabbage")
+	_, ok := interface{}(cabbage).(plant)
+	if ok {
+	    fmt.Println("cabbage is a plant")
+	} else {
+	    fmt.Println("cabbage is not a plant")
+	}
+	_, ok = interface{}(cabbage).(food)
+	if ok {
+	    fmt.Println("cabbage is food")
+	} else {
+	    fmt.Println("cabbage is not food")
+	}
+    
 	var anyType interface{}
 	anyType = 77.0
 	anyType = "I am a string now"
