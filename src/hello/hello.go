@@ -136,6 +136,16 @@ func tryShape() {
     fmt.Printf("Area of a MultiShape consists of a circle and two rectangles=%f\n", ms.Area())   
 }
 
+func tryFuncs() {
+	fmt.Printf("\b\n--- tryFuncs() ---\n")
+	util.TryFuncs()    
+}
+
+func tryAnagram() {
+	fmt.Printf("\b\n--- tryAnagram() ---\n")    
+    util.TryAnagram()
+}
+
 func main() {
 	tryReverse()
 	tryConstant()
@@ -144,4 +154,6 @@ func main() {
 	tryCurr()
 	tryPtr()
 	tryShape()
+	tryFuncs()
+	//tryAnagram()
 }
