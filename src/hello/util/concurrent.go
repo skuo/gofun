@@ -1,10 +1,18 @@
 package util
 
 import (
-    "fmt"
+	"fmt"
 	"strings"
 )
 
+var data = []string{
+	"The yellow fish swims slowly in the water",
+	"The brown dog barks loudly after a drink from its water bowl",
+	"The dark bird of prey lands on a small tree after hunting for fish",
+}
+
+// =========================
+// Two chans
 // generator function that produces data
 func words(stopCh chan struct{}, data []string) <-chan string {
 	out := make(chan string)
@@ -19,10 +27,10 @@ func words(stopCh chan struct{}, data []string) <-chan string {
 				word = strings.ToLower(word)
 				select {
 				case out <- word:
-    				// no statement is needed
-    				//count++
+					// no statement is needed
+					//count++
 				case <-stopCh:
-    				//fmt.Println("total words processed=", count)
+					//fmt.Println("total words processed=", count)
 					return
 				}
 			}
@@ -33,11 +41,6 @@ func words(stopCh chan struct{}, data []string) <-chan string {
 }
 
 func tryTwoChans() {
-	data := []string{
-		"The yellow fish swims slowly in the water",
-		"The brown dog barks loudly after a drink from its water bowl",
-		"The dark bird of prey lands on a small tree after hunting for fish",
-	}
 
 	histogram := make(map[string]int)
 	stopCh := make(chan struct{})
@@ -55,6 +58,69 @@ func tryTwoChans() {
 	}
 }
 
+// =========================
+// chained chans
+type histogram struct {
+	total int
+	freq  map[string]int
+}
+
+func (h *histogram) ingest() <-chan string {
+	out := make(chan string)
+	go func() {
+		defer close(out)
+		for _, line := range data {
+			out <- line
+		}
+	}()
+	return out
+}
+
+func (h *histogram) split(in <-chan string) <-chan string {
+	out := make(chan string)
+	go func() {
+		defer close(out)
+		for line := range in {
+			for _, word := range strings.Split(line, " ") {
+				out <- strings.ToLower(word)
+			}
+		}
+	}()
+	return out
+}
+
+func (h *histogram) count(in <-chan string) chan struct{} {
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for word := range in {
+			h.freq[word]++
+			h.total++
+		}
+		for k, v := range h.freq {
+    		fmt.Printf("chainedChan %s\t(%d)\n", k, v)
+		}
+	}()
+	return done
+}
+
+func tryChainedChans() {
+	h := &histogram{freq: make(map[string]int)}
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		<-h.count(h.split(h.ingest()))
+	}()
+	<-done
+	fmt.Printf("Counted %d words!\n", h.total)
+}
+
+// =========================
+// mutex
+
+
+// =========================
 func TryConcurrent() {
-    tryTwoChans()
+	tryTwoChans()
+	tryChainedChans()
 }
