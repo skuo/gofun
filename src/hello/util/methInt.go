@@ -152,17 +152,73 @@ func (v volume) String() string {
 }
 
 func tryStructMethod() {
-    v := volume{unit: "quart", qty: 7}
-    v.String()
-    fmt.Println(v.String())    
+	v := volume{unit: "quart", qty: 7}
+	v.String()
+	fmt.Println(v.String())
 }
 
 // =============================
 // Interface
+type food interface {
+	eat()
+}
+
+type veggie string
+
+func (v veggie) eat() {
+	fmt.Println("Eating", v)
+}
+
+type meat string
+
+func (m meat) eat() {
+	fmt.Println("Eating tasty", m)
+}
+
+func eat(f food) {
+	switch morsel := f.(type) {
+	case veggie:
+		if morsel == "okra" {
+			fmt.Println("Yuk! not eating ", morsel)
+		} else {
+			morsel.eat()
+		}
+	case meat:
+		if morsel == "beef" {
+			fmt.Println("Yuk! not eating ", morsel)
+		} else {
+			morsel.eat()
+		}
+	default:
+		fmt.Println("Not eating whatever that is: ", f)
+	}
+}
+
+func printAnyType(val interface{}) {
+	fmt.Println(val)
+}
+
+func tryInterface() {
+	eat(veggie("carrot"))
+	eat(meat("lamb"))
+	eat(veggie("okra"))
+	eat(meat("beef"))
+
+	var anyType interface{}
+	anyType = 77.0
+	anyType = "I am a string now"
+	fmt.Println(anyType)
+
+	printAnyType("The car is slow")
+	m := map[string]string{"ID": "12345", "name": "Kerry"}
+	printAnyType(m)
+	printAnyType(1253443455)
+}
 
 // =============================
 func TryMethInt() {
 	tryMethod()
 	tryStructObj()
 	tryStructMethod()
+	tryInterface()
 }

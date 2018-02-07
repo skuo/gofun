@@ -131,6 +131,7 @@ func tryShape() {
     // Shape
     fmt.Printf("Total area of circle and rectangle=%f\n", util.TotalArea(&c, &r))
     // MultiShape
+    // passing circle, rectangle as shapes
     r2 := util.Rectangle{0, 0, 5, 5}
     ms := util.MultiShape{ []util.Shape{&c, &r, &r2} }
     fmt.Printf("Area of a MultiShape consists of a circle and two rectangles=%f\n", ms.Area())   
