@@ -151,6 +151,11 @@ func tryCompositeType() {
     util.TryCompositeType()
 }
 
+func tryMethInt() {
+	fmt.Printf("\n\n--- tryMethInt() ---\n")    
+    util.TryMethInt()
+}
+
 func main() {
 	tryReverse()
 	tryConstant()
@@ -162,4 +167,5 @@ func main() {
 	tryFuncs()
 	//tryAnagram()
 	tryCompositeType()
+	tryMethInt()
 }
