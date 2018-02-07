@@ -1,6 +1,7 @@
 package util
 
 import (
+    "encoding/json"
 	"fmt"
 	"math/rand"
 	"time"
@@ -143,9 +144,53 @@ func tryMap() {
 	}
 }
 
+// =========================
+// Struct
+// Pass pointer for function param
+
+type Person struct {
+	Name    string `json:"person_name"`
+	Title   string `json:"person_title"`
+	Address `json:"person_address_obj"`
+}
+
+type Address struct {
+	Street string `json:"person_addr_street"`
+	City   string `json:"person_city"`
+	State  string `json:"person_state"`
+	Postal string `json:"person_postal_code"`
+}
+
+func updateName(p *Person, name string) {
+	p.Name = name
+}
+
+func tryStruct() {
+	p := Person{
+		Name:  "Unknown",
+		Title: "Author",
+		Address: Address{
+			Street: "1234 Main street",
+			City:   "Goville",
+			State:  "Go",
+			Postal: "12345",
+		},
+	}
+	fmt.Println(p)
+	updateName(&p, "Vladimir Vivien")
+	fmt.Println(p)
+
+	b, err := json.Marshal(p)
+	if err != nil {
+		panic(err.Error())
+	}
+	fmt.Println(string(b))
+}
+
 // ============================
 func TryCompositeType() {
 	tryArray()
 	trySlice()
 	tryMap()
+	tryStruct()
 }
