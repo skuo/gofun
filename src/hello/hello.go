@@ -61,7 +61,7 @@ func tryNummap() {
 }
 
 func tryGoto() {
-	fmt.Printf("\b\n--- tryGoto() ---\n")
+	fmt.Printf("\n\n--- tryGoto() ---\n")
 	var a string
 Start:
 	for {
@@ -84,7 +84,7 @@ Start:
 }
 
 func tryCurr() {
-	fmt.Printf("\b\n--- tryCurr() ---\n")
+	fmt.Printf("\n\n--- tryCurr() ---\n")
 	// find
 	util.Find("Dinar")
 	util.Find("HTG")
@@ -107,7 +107,7 @@ func tryCurr() {
 }
 
 func tryPtr() {
-	fmt.Printf("\b\n--- tryPtr() ---\n")
+	fmt.Printf("\n\n--- tryPtr() ---\n")
 	// new pointer
 	intptr := new(int)
 	*intptr = 44
@@ -121,7 +121,7 @@ func tryPtr() {
 }
 
 func tryShape() {
-	fmt.Printf("\b\n--- tryShape() ---\n")
+	fmt.Printf("\n\n--- tryShape() ---\n")
     // Circle
     c := util.Circle{0,0,5}
     fmt.Printf("Area of circle=%f\n", c.Area());
@@ -137,13 +137,18 @@ func tryShape() {
 }
 
 func tryFuncs() {
-	fmt.Printf("\b\n--- tryFuncs() ---\n")
+	fmt.Printf("\n\n--- tryFuncs() ---\n")
 	util.TryFuncs()    
 }
 
 func tryAnagram() {
-	fmt.Printf("\b\n--- tryAnagram() ---\n")    
+	fmt.Printf("\n\n--- tryAnagram() ---\n")    
     util.TryAnagram()
+}
+
+func tryCompositeType() {
+	fmt.Printf("\n\n--- tryCompositeType() ---\n")    
+    util.TryCompositeType()
 }
 
 func main() {
@@ -156,4 +161,5 @@ func main() {
 	tryShape()
 	tryFuncs()
 	//tryAnagram()
+	tryCompositeType()
 }
