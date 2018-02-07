@@ -157,6 +157,10 @@ func tryMethInt() {
     util.TryMethInt()
 }
 
+func tryConcurrent() {
+	fmt.Printf("\n\n--- tryConcurrent() ---\n")    
+    util.TryConcurrent()
+}
 func main() {
 	tryReverse()
 	tryConstant()
@@ -169,4 +173,5 @@ func main() {
 	//tryAnagram()
 	tryCompositeType()
 	tryMethInt()
+	tryConcurrent()
 }
