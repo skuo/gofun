@@ -25,7 +25,7 @@ func tryBufio() {
 	books.WriteString("Neptune 49528 14 Yes\n")
 	books.WriteString("Pluto 2370 5 No\n")
 
-	fout, err := os.Create("data/planets.txt")
+	fout, err := os.Create("output/planets.txt")
 	if err != nil {
 		fmt.Println("Unable to create file:", err)
 		return
@@ -34,7 +34,7 @@ func tryBufio() {
 	books.WriteTo(fout)
 
 	//
-	fin, err := os.Open("data/planets.txt")
+	fin, err := os.Open("output/planets.txt")
 	if err != nil {
 		fmt.Println("Unable to open file:", err)
 		return
@@ -76,7 +76,7 @@ func tryFmt() {
 		{"Tellerium", 52, 127.60},
 		{"Polonium", 84, 209.0},
 	}
-	file, err := os.Create("data/metalloids.txt")
+	file, err := os.Create("output/metalloids.txt")
 	if err != nil {
 		fmt.Println("Error creating file:", err)
 		os.Exit(1)
@@ -95,7 +95,7 @@ func tryFmt() {
 	var number int32
 	var weight float64
 
-	data, err := os.Open("data/metalloids.txt")
+	data, err := os.Open("output/metalloids.txt")
 	if err != nil {
 		fmt.Println("Unable to open metalloid data:", err)
 		return
