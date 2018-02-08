@@ -3,6 +3,7 @@ package util
 import (
 	"bufio"
 	"bytes"
+	"compress/gzip"
 	"encoding/gob"
 	"fmt"
 	"io"
@@ -199,9 +200,40 @@ func tryGob() {
 		return
 	}
 
-    for _, book := range booksRead {
-    	fmt.Println(book)
-    }
+	for _, book := range booksRead {
+		fmt.Println(book)
+	}
+}
+
+// ====================
+// gzip
+func tryGzip() {
+	fmt.Println("\n--- in tryGzip() ---\n")
+	filein, err := os.Open("src/hello/util/dataIo.go")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	defer filein.Close()
+
+	// zip content to output file
+	fileout, err := os.Create("output/dataIo.go.gz")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	defer fileout.Close()
+
+	zip := gzip.NewWriter(fileout)
+	zip.Name = fileout.Name()
+	defer zip.Close()
+
+	if count, err := io.Copy(zip, filein); err == nil {
+		fmt.Printf("Gzipd file %s with %d bytes", fileout.Name(), count)
+	} else {
+		fmt.Println("Gzip failed:", err)
+		os.Exit(1)
+	}
 }
 
 // ====================
@@ -209,4 +241,5 @@ func TryDataIo() {
 	tryBufio()
 	tryFmt()
 	tryGob()
+	tryGzip()
 }
