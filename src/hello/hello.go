@@ -161,6 +161,12 @@ func tryConcurrent() {
 	fmt.Printf("\n\n--- tryConcurrent() ---\n")    
     util.TryConcurrent()
 }
+
+func tryDataIo() {
+	fmt.Printf("\n\n--- tryDataIo() ---\n")    
+    util.TryDataIo()
+}
+
 func main() {
 	tryReverse()
 	tryConstant()
@@ -174,4 +180,5 @@ func main() {
 	tryCompositeType()
 	tryMethInt()
 	tryConcurrent()
+	tryDataIo()
 }
