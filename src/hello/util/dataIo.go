@@ -139,12 +139,12 @@ type Name struct {
 }
 
 type Book struct {
-	Title       string
-	PageCount   int
-	ISBN        string
-	Authors     []Name
-	Publisher   string
-	PublishDate time.Time
+	Title       string    `json:"book_title"`
+	PageCount   int       `json:"pages,string"`
+	ISBN        string    `json:"-"`
+	Authors     []Name    `json:"auths,omniempty"`
+	Publisher   string    `json:",omniempty"`
+	PublishDate time.Time `json:"pub_date"`
 }
 
 var books = []Book{
@@ -240,6 +240,22 @@ func tryGzip() {
 
 // ====================
 // json
+func (n *Name) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("\"%s, %s\"", n.Last, n.First)), nil
+}
+
+func (n *Name) UnmarshalJSON(data []byte) error {
+	var name string
+	err := json.Unmarshal(data, &name)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	parts := strings.Split(name, ", ")
+	n.Last, n.First = parts[0], parts[1]
+	return nil
+}
+
 func tryJson() {
 	fmt.Println("\n--- in tryJson() ---\n")
 	// write json
