@@ -3,6 +3,7 @@ package util
 import (
 	"fmt"
 	"strings"
+	"sync"
 )
 
 var data = []string{
@@ -98,7 +99,7 @@ func (h *histogram) count(in <-chan string) chan struct{} {
 			h.total++
 		}
 		for k, v := range h.freq {
-    		fmt.Printf("chainedChan %s\t(%d)\n", k, v)
+			fmt.Printf("chainedChan %s\t(%d)\n", k, v)
 		}
 	}()
 	return done
@@ -118,9 +119,108 @@ func tryChainedChans() {
 // =========================
 // mutex
 
+type Service struct {
+	started bool
+	stpCh   chan struct{}
+	mutex   sync.RWMutex
+	cache   map[int]string
+}
+
+func (s *Service) Start() {
+	fmt.Println("In Start()")
+	s.stpCh = make(chan struct{})
+	s.cache = make(map[int]string)
+	go func() {
+		s.mutex.Lock()
+		s.started = true
+		s.cache[1] = "Hello World"
+		s.cache[2] = "Hello Universe"
+		s.cache[3] = "Hello Galaxy!"
+		fmt.Println("Start() finished initialization")
+		s.mutex.Unlock()
+		<-s.stpCh // wait to be closed.
+	}()
+}
+
+func (s *Service) Stop() {
+	fmt.Println("In Stop()")
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	if s.started {
+		s.started = false
+		close(s.stpCh)
+		fmt.Println("Stop() closed stopCh")
+	}
+}
+
+func (s *Service) Serve(id int) {
+	s.mutex.Lock()
+	msg := s.cache[id]
+	s.mutex.Unlock()
+	if msg != "" {
+		fmt.Println(msg)
+	} else {
+		fmt.Println("Hello, goodbye!")
+	}
+}
+
+// tryMutex() does not really work as the goroutine in Start() does not
+// get run before s.Serve(3) and s.Stop() is called.
+func tryMutex() {
+	s := &Service{}
+	s.Start()
+	s.Serve(3) // do some work
+	s.Stop()
+}
+
+// =========================
+// workgroup
+const MAX = 300
+const workers = 3
+
+func tryWorkgroup() {
+	fmt.Printf("\n\n--- tryWorkgroup() ---\n")
+	values := make(chan int)
+	result := make(chan int, workers)
+	var wg sync.WaitGroup
+
+	go func() { // gen multiple of 3 & 5 values
+		for i := 1; i < MAX; i++ {
+			if (i%3) == 0 && (i%5) == 0 {
+				values <- i // push downstream
+			}
+		}
+		close(values)
+	}()
+
+	work := func(index int) { // work unit, calc partial result
+		defer wg.Done()
+		r := 0
+		for i := range values {
+		    fmt.Println("index=", index, "i=", i)
+			r += i
+		}
+		result <- r
+	}
+
+	wg.Add(workers)
+	for i := 0; i < workers; i++ {
+		go work(i) // execute on its own thread
+	}
+
+	wg.Wait() // wait for both groutines
+	close(result)
+	total := 0
+	for pr := range result {
+		total += pr
+	}
+	fmt.Println("Total:", total)
+}
 
 // =========================
 func TryConcurrent() {
-	tryTwoChans()
-	tryChainedChans()
+	//tryTwoChans()
+	//tryChainedChans()
+	//tryMutex()
+	tryWorkgroup()
 }
