@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/gob"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -146,34 +147,35 @@ type Book struct {
 	PublishDate time.Time
 }
 
+var books = []Book{
+	Book{
+		Title:       "Leaning Go",
+		PageCount:   375,
+		ISBN:        "9781784395438",
+		Authors:     []Name{{"Vladimir", "Vivien"}},
+		Publisher:   "Packt",
+		PublishDate: time.Date(2016, time.July, 0, 0, 0, 0, 0, time.UTC),
+	},
+	Book{
+		Title:       "The Go Programming Language",
+		PageCount:   380,
+		ISBN:        "9780134190440",
+		Authors:     []Name{{"Alan", "Donavan"}, {"Brian", "Kernighan"}},
+		Publisher:   "Addison-Wesley",
+		PublishDate: time.Date(2015, time.October, 26, 0, 0, 0, 0, time.UTC),
+	},
+	Book{
+		Title:       "Introducing Go",
+		PageCount:   124,
+		ISBN:        "978-1491941959",
+		Authors:     []Name{{"Caleb", "Doxsey"}},
+		Publisher:   "O'Reilly",
+		PublishDate: time.Date(2016, time.January, 0, 0, 0, 0, 0, time.UTC),
+	},
+}
+
 func tryGob() {
 	fmt.Println("\n--- in tryGob() ---\n")
-	books := []Book{
-		Book{
-			Title:       "Leaning Go",
-			PageCount:   375,
-			ISBN:        "9781784395438",
-			Authors:     []Name{{"Vladimir", "Vivien"}},
-			Publisher:   "Packt",
-			PublishDate: time.Date(2016, time.July, 0, 0, 0, 0, 0, time.UTC),
-		},
-		Book{
-			Title:       "The Go Programming Language",
-			PageCount:   380,
-			ISBN:        "9780134190440",
-			Authors:     []Name{{"Alan", "Donavan"}, {"Brian", "Kernighan"}},
-			Publisher:   "Addison-Wesley",
-			PublishDate: time.Date(2015, time.October, 26, 0, 0, 0, 0, time.UTC),
-		},
-		Book{
-			Title:       "Introducing Go",
-			PageCount:   124,
-			ISBN:        "978-1491941959",
-			Authors:     []Name{{"Caleb", "Doxsey"}},
-			Publisher:   "O'Reilly",
-			PublishDate: time.Date(2016, time.January, 0, 0, 0, 0, 0, time.UTC),
-		},
-	}
 
 	// write books
 	file, err := os.Create("output/book.dat")
@@ -201,7 +203,7 @@ func tryGob() {
 	}
 
 	for _, book := range booksRead {
-		fmt.Println(book)
+		fmt.Println("gob", book)
 	}
 }
 
@@ -237,9 +239,45 @@ func tryGzip() {
 }
 
 // ====================
+// json
+func tryJson() {
+	fmt.Println("\n--- in tryJson() ---\n")
+	// write json
+	file, err := os.Create("output/book.json")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	enc := json.NewEncoder(file)
+	if err := enc.Encode(books); err != nil {
+		fmt.Println(err)
+	}
+
+	// read in books
+	fin, err := os.Open("output/book.json")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// read json
+	var booksRead []Book
+	dec := json.NewDecoder(fin)
+	if err := dec.Decode(&booksRead); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	for _, book := range booksRead {
+		fmt.Println("json", book)
+	}
+}
+
+// ====================
 func TryDataIo() {
 	tryBufio()
 	tryFmt()
 	tryGob()
 	tryGzip()
+	tryJson()
 }
