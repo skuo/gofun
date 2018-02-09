@@ -40,9 +40,14 @@
 		row.insertCell(3).innerHTML = country;
 	}
 
+	function deleteDataRows() {
+		var rowCount = tbl.rows.length; 
+		while(--rowCount) tbl.deleteRow(rowCount);
+	}
+	
 	function doRequest() {
 		param = document.getElementById("in").value
-        $.ajax('/currency', {
+        $.ajax('/currency/param1', {
             method: 'PUT',
 			contentType: 'application/json',
 			processData: false,
@@ -50,6 +55,7 @@
 		}).then(
 		function success(currencies) {
 			currs = JSON.parse(currencies)
+			deleteDataRows();
 			for (i=0; i < currs.length; i++) {
 				addRow(
 					currs[i].currency_code,

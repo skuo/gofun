@@ -13,6 +13,7 @@ import (
 var currencies = curr1.Load("data/curr1.csv")
 
 // api endpoint for service
+// input of this form: {"get" : "Yen"}
 func currs(resp http.ResponseWriter, req *http.Request) {
     fmt.Println("URL", req.URL);
 	var currRequest curr1.CurrencyRequest
@@ -46,7 +47,8 @@ func gui(resp http.ResponseWriter, req *http.Request) {
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", gui)
-	mux.HandleFunc("/currency", currs)
+	// handle all variations under /currency/
+	mux.HandleFunc("/currency/", currs)
 
     fmt.Println("Starting http server")
 	if err := http.ListenAndServe(":4040", mux); err != nil {
