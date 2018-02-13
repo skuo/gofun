@@ -16,7 +16,7 @@ import (
 // ====================
 // bufio
 func tryBufio() {
-	fmt.Println("\n--- in tryBufio() ---\n")
+	fmt.Println("\n** in tryBufio() **\n")
 	// write with bytes
 	var books bytes.Buffer
 	books.WriteString("Mercury 4879 0 No\n")
@@ -70,7 +70,7 @@ type metalloid struct {
 }
 
 func tryFmt() {
-	fmt.Println("\n--- in tryFmt() ---\n")
+	fmt.Println("\n** in tryFmt() **\n")
 	var metalloids = []metalloid{
 		{"Boron", 5, 10.81},
 		{"Silicon", 14, 28.085},
@@ -175,7 +175,7 @@ var books = []Book{
 }
 
 func tryGob() {
-	fmt.Println("\n--- in tryGob() ---\n")
+	fmt.Println("\n** in tryGob() **\n")
 
 	// write books
 	file, err := os.Create("output/book.dat")
@@ -210,7 +210,7 @@ func tryGob() {
 // ====================
 // gzip
 func tryGzip() {
-	fmt.Println("\n--- in tryGzip() ---\n")
+	fmt.Println("\n** in tryGzip() **\n")
 	filein, err := os.Open("src/hello/util/dataIo.go")
 	if err != nil {
 		fmt.Println(err)
@@ -257,7 +257,7 @@ func (n *Name) UnmarshalJSON(data []byte) error {
 }
 
 func tryJson() {
-	fmt.Println("\n--- in tryJson() ---\n")
+	fmt.Println("\n** in tryJson() **\n")
 	// write json
 	file, err := os.Create("output/book.json")
 	if err != nil {
