@@ -15,8 +15,8 @@ import (
 
 // ====================
 // bufio
-func tryBufio() {
-	fmt.Println("\n** in tryBufio() **\n")
+func tryBufIO() {
+	fmt.Println("\n** in tryBufIO() **\n")
 	// write with bytes
 	var books bytes.Buffer
 	books.WriteString("Mercury 4879 0 No\n")
@@ -291,7 +291,7 @@ func tryJson() {
 
 // ====================
 func TryDataIo() {
-	tryBufio()
+	tryBufIO()
 	tryFmt()
 	tryGob()
 	tryGzip()
