@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"hello/constant"
 	"hello/stringutil"
@@ -31,13 +32,23 @@ func tryConstant() {
 
 func tryNummap() {
 	fmt.Printf("\n\n--- tryNummap() ---\n")
+	pwd, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println(pwd)
+	index := strings.Index(pwd, "/src/hello")
+	if index != -1 {
+		pwd = pwd[0:index]
+	}
 	// create and store bimap in "nummap.txt"
 	max := 10
 	fileMode := 4000
-	mapFileName := "output/nummap.txt"
+	mapFileName := pwd + "/output/nummap.txt"
 
 	nummap := util.MakeBitMap(max)
-	err := ioutil.WriteFile(mapFileName, []byte(nummap), os.FileMode(fileMode))
+	err = ioutil.WriteFile(mapFileName, []byte(nummap), os.FileMode(fileMode))
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -51,7 +62,7 @@ func tryNummap() {
 		os.Exit(1)
 	}
 
-	numbersFile := "output/nums.txt"
+	numbersFile := pwd + "/output/nums.txt"
 	err = ioutil.WriteFile(numbersFile, nums.Bytes(), os.FileMode(fileMode))
 	if err != nil {
 		fmt.Println(err)
@@ -122,49 +133,49 @@ func tryPtr() {
 
 func tryShape() {
 	fmt.Printf("\n\n--- tryShape() ---\n")
-    // Circle
-    c := util.Circle{0,0,5}
-    fmt.Printf("Area of circle=%f\n", c.Area());
-    // Rectangle
-    r := util.Rectangle{0,0,10,10}
-    fmt.Printf("Area of rectangle=%f\n", r.Area());
-    // Shape
-    fmt.Printf("Total area of circle and rectangle=%f\n", util.TotalArea(&c, &r))
-    // MultiShape
-    // passing circle, rectangle as shapes
-    r2 := util.Rectangle{0, 0, 5, 5}
-    ms := util.MultiShape{ []util.Shape{&c, &r, &r2} }
-    fmt.Printf("Area of a MultiShape consists of a circle and two rectangles=%f\n", ms.Area())   
+	// Circle
+	c := util.Circle{0, 0, 5}
+	fmt.Printf("Area of circle=%f\n", c.Area())
+	// Rectangle
+	r := util.Rectangle{0, 0, 10, 10}
+	fmt.Printf("Area of rectangle=%f\n", r.Area())
+	// Shape
+	fmt.Printf("Total area of circle and rectangle=%f\n", util.TotalArea(&c, &r))
+	// MultiShape
+	// passing circle, rectangle as shapes
+	r2 := util.Rectangle{0, 0, 5, 5}
+	ms := util.MultiShape{[]util.Shape{&c, &r, &r2}}
+	fmt.Printf("Area of a MultiShape consists of a circle and two rectangles=%f\n", ms.Area())
 }
 
 func tryFuncs() {
 	fmt.Printf("\n\n--- tryFuncs() ---\n")
-	util.TryFuncs()    
+	util.TryFuncs()
 }
 
 func tryAnagram() {
-	fmt.Printf("\n\n--- tryAnagram() ---\n")    
-    util.TryAnagram()
+	fmt.Printf("\n\n--- tryAnagram() ---\n")
+	util.TryAnagram()
 }
 
 func tryCompositeType() {
-	fmt.Printf("\n\n--- tryCompositeType() ---\n")    
-    util.TryCompositeType()
+	fmt.Printf("\n\n--- tryCompositeType() ---\n")
+	util.TryCompositeType()
 }
 
 func tryMethInt() {
-	fmt.Printf("\n\n--- tryMethInt() ---\n")    
-    util.TryMethInt()
+	fmt.Printf("\n\n--- tryMethInt() ---\n")
+	util.TryMethInt()
 }
 
 func tryConcurrent() {
-	fmt.Printf("\n\n--- tryConcurrent() ---\n")    
-    util.TryConcurrent()
+	fmt.Printf("\n\n--- tryConcurrent() ---\n")
+	util.TryConcurrent()
 }
 
 func tryDataIo() {
-	fmt.Printf("\n\n--- tryDataIo() ---\n")    
-    util.TryDataIo()
+	fmt.Printf("\n\n--- tryDataIo() ---\n")
+	util.TryDataIo()
 }
 
 func main() {

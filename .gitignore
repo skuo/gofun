@@ -8,3 +8,9 @@ output/
 
 *~
 .idea/
+.vscode/
+**/debug
+
+src/github.com/
+src/golang.org/
+src/sourcegraph.com/

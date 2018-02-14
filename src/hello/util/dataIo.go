@@ -13,9 +13,24 @@ import (
 	"time"
 )
 
+func getPwd() string {
+	// find cwd and strip out /src/hello if necessary
+	pwd, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println(pwd)
+	index := strings.Index(pwd, "/src/hello")
+	if index != -1 {
+		pwd = pwd[0:index]
+	}
+	return pwd
+}
+
 // ====================
 // bufio
-func tryBufIO() {
+func tryBufIO(pwd string) {
 	fmt.Println("\n** in tryBufIO() **\n")
 	// write with bytes
 	var books bytes.Buffer
@@ -29,7 +44,8 @@ func tryBufIO() {
 	books.WriteString("Neptune 49528 14 Yes\n")
 	books.WriteString("Pluto 2370 5 No\n")
 
-	fout, err := os.Create("output/planets.txt")
+	filename := pwd + "/output/planets.txt"
+	fout, err := os.Create(filename)
 	if err != nil {
 		fmt.Println("Unable to create file:", err)
 		return
@@ -38,7 +54,7 @@ func tryBufIO() {
 	books.WriteTo(fout)
 
 	//
-	fin, err := os.Open("output/planets.txt")
+	fin, err := os.Open(filename)
 	if err != nil {
 		fmt.Println("Unable to open file:", err)
 		return
@@ -80,7 +96,19 @@ func tryFmt() {
 		{"Tellerium", 52, 127.60},
 		{"Polonium", 84, 209.0},
 	}
-	file, err := os.Create("output/metalloids.txt")
+	// find cwd and strip out "/src/hello" if necessary
+	pwd, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println(pwd)
+	index := strings.Index(pwd, "/src/hello")
+	if index != -1 {
+		pwd = pwd[0:index]
+	}
+	filename := pwd + "/output/metalloids.txt"
+	file, err := os.Create(filename)
 	if err != nil {
 		fmt.Println("Error creating file:", err)
 		os.Exit(1)
@@ -99,7 +127,7 @@ func tryFmt() {
 	var number int32
 	var weight float64
 
-	data, err := os.Open("output/metalloids.txt")
+	data, err := os.Open(filename)
 	if err != nil {
 		fmt.Println("Unable to open metalloid data:", err)
 		return
@@ -174,11 +202,11 @@ var books = []Book{
 	},
 }
 
-func tryGob() {
+func tryGob(pwd string) {
 	fmt.Println("\n** in tryGob() **\n")
 
 	// write books
-	file, err := os.Create("output/book.dat")
+	file, err := os.Create(pwd + "/output/book.dat")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -189,7 +217,7 @@ func tryGob() {
 	}
 
 	// read in books
-	fin, err := os.Open("output/book.dat")
+	fin, err := os.Open(pwd + "/output/book.dat")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -209,9 +237,9 @@ func tryGob() {
 
 // ====================
 // gzip
-func tryGzip() {
+func tryGzip(pwd string) {
 	fmt.Println("\n** in tryGzip() **\n")
-	filein, err := os.Open("src/hello/util/dataIo.go")
+	filein, err := os.Open(pwd + "/src/hello/util/dataIo.go")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -219,7 +247,7 @@ func tryGzip() {
 	defer filein.Close()
 
 	// zip content to output file
-	fileout, err := os.Create("output/dataIo.go.gz")
+	fileout, err := os.Create(pwd + "/output/dataIo.go.gz")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -256,10 +284,10 @@ func (n *Name) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func tryJson() {
+func tryJson(pwd string) {
 	fmt.Println("\n** in tryJson() **\n")
 	// write json
-	file, err := os.Create("output/book.json")
+	file, err := os.Create(pwd + "/output/book.json")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -270,7 +298,7 @@ func tryJson() {
 	}
 
 	// read in books
-	fin, err := os.Open("output/book.json")
+	fin, err := os.Open(pwd + "/output/book.json")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -291,9 +319,10 @@ func tryJson() {
 
 // ====================
 func TryDataIo() {
-	tryBufIO()
+	pwd := getPwd()
+	tryBufIO(pwd)
 	tryFmt()
-	tryGob()
-	tryGzip()
-	tryJson()
+	tryGob(pwd)
+	tryGzip(pwd)
+	tryJson(pwd)
 }
