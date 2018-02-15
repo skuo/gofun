@@ -12,7 +12,9 @@ output/
 **/debug
 **/debug.test
 **/*.pb
+**/*.csv*
 
 src/github.com/
 src/golang.org/
 src/sourcegraph.com/
+src/glue/converter/csv2Pb_test.go

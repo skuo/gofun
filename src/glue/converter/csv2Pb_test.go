@@ -2,6 +2,8 @@ package converter
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
 	"testing"
 )
 
@@ -39,4 +41,44 @@ func validateRow(val float32, expVal float32, t *testing.T) {
 	if val != expVal {
 		t.Error("val:", val, " != expVal:", expVal)
 	}
+}
+
+func TestGenCsvFiles(t *testing.T) {
+	// 100x
+	os.Remove("/Users/steve/git/gofun/src/glue/mt_bruno_elevation_100.csv")
+	for i := 0; i < 100; i++ {
+		cmd := exec.Command("bash", "-c", "cat /Users/steve/git/gofun/src/glue/mt_bruno_elevation.csv >> /Users/steve/git/gofun/src/glue/mt_bruno_elevation_100.csv")
+		err := cmd.Run()
+		checkError(err)
+	}
+	// 10,000x
+	os.Remove("/Users/steve/git/gofun/src/glue/mt_bruno_elevation_10K.csv")
+	for i := 0; i < 100; i++ {
+		cmd := exec.Command("bash", "-c", "cat /Users/steve/git/gofun/src/glue/mt_bruno_elevation_100.csv >> /Users/steve/git/gofun/src/glue/mt_bruno_elevation_10K.csv")
+		err := cmd.Run()
+		checkError(err)
+	}
+	// 100,000x
+	os.Remove("/Users/steve/git/gofun/src/glue/mt_bruno_elevation_100K.csv")
+	for i := 0; i < 10; i++ {
+		cmd := exec.Command("bash", "-c", "cat /Users/steve/git/gofun/src/glue/mt_bruno_elevation_10K.csv >> /Users/steve/git/gofun/src/glue/mt_bruno_elevation_100K.csv")
+		_, err := cmd.Output()
+		checkError(err)
+	}
+}
+
+func checkError(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
+func TestGenPbFiles(t *testing.T) {
+	fmt.Println("TestGenPbFiles")
+	// read csv and write pb
+	Csv2Pb("/Users/steve/git/gofun/src/glue/mt_bruno_elevation.csv", "/Users/steve/git/gofun/src/glue/mt_bruno_elevation.pb")
+	Csv2Pb("/Users/steve/git/gofun/src/glue/mt_bruno_elevation_100.csv", "/Users/steve/git/gofun/src/glue/mt_bruno_elevation_100.pb")
+	Csv2Pb("/Users/steve/git/gofun/src/glue/mt_bruno_elevation_10K.csv", "/Users/steve/git/gofun/src/glue/mt_bruno_elevation_10K.pb")
+	Csv2Pb("/Users/steve/git/gofun/src/glue/mt_bruno_elevation_100K.csv", "/Users/steve/git/gofun/src/glue/mt_bruno_elevation_100K.pb")
+	//Csv2Pb("/Users/steve/git/gofun/src/glue/mt_bruno_elevation_1M.csv", "/Users/steve/git/gofun/src/glue/mt_bruno_elevation_1M.pb")
 }

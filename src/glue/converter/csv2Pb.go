@@ -32,7 +32,9 @@ func Csv2Pb(csvFname string, pbFname string) {
 
 	dataFile := &pb.PbDataFile{}
 	csvReader := csv.NewReader(csvFile)
+	lineNum := 0
 	for {
+		lineNum++
 		record, err := csvReader.Read()
 		if err == io.EOF {
 			break
@@ -40,8 +42,7 @@ func Csv2Pb(csvFname string, pbFname string) {
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		fmt.Println(record)
+		//fmt.Println(record)
 
 		// generate protobuf
 		dataRow := &pb.PbDataRow{}
@@ -58,6 +59,7 @@ func Csv2Pb(csvFname string, pbFname string) {
 		}
 		dataFile.Rows = append(dataFile.Rows, dataRow)
 	}
+	fmt.Println(csvFname, "lineNum=", lineNum)
 	// Write data file to disk.
 	out, err := proto.Marshal(dataFile)
 	if err != nil {
