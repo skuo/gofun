@@ -1,0 +1,11 @@
+syntax = "proto3";
+package converter;
+
+message PbDataRow {
+    int32 key = 1;
+    repeated float data = 2;
+}
+
+message PbDataFile {
+    repeated PbDataRow rows = 1;
+}

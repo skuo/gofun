@@ -11,6 +11,7 @@ output/
 .vscode/
 **/debug
 **/debug.test
+**/*.pb
 
 src/github.com/
 src/golang.org/
