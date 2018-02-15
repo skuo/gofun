@@ -1,0 +1,7 @@
+syntax = "proto3";
+package converter;
+
+message DataRow {
+    int32 key = 1;
+    repeated int32 data = 24;
+}

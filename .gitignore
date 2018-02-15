@@ -10,6 +10,7 @@ output/
 .idea/
 .vscode/
 **/debug
+**/debug.test
 
 src/github.com/
 src/golang.org/
