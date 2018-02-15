@@ -68,8 +68,8 @@ func Csv2Pb(csvFname string, pbFname string) {
 	}
 }
 
-// ReadCsvPb returns [][]string
-func ReadCsvPb(pbFname string) {
+// ReadCsvPb returns *pb.PbDataFile
+func ReadCsvPb(pbFname string) *pb.PbDataFile {
 	// Read the existing data file
 	in, err := ioutil.ReadFile(pbFname)
 	if err != nil {
@@ -79,12 +79,5 @@ func ReadCsvPb(pbFname string) {
 	if err := proto.Unmarshal(in, dataFile); err != nil {
 		log.Fatalln("Failed to parse data file:", err)
 	}
-	for _, row := range dataFile.Rows {
-		fmt.Print("[", row.GetKey())
-		for _, val := range row.GetData() {
-			fmt.Print(" ", val)
-		}
-		fmt.Println("]")
-	}
-	return
+	return dataFile
 }
