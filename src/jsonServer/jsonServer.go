@@ -117,7 +117,7 @@ func listHeaders(resp http.ResponseWriter, req *http.Request) {
 func main() {
 	var dir string
 
-	flag.StringVar(&dir, "dir", getPwd(), "the directory to serve files from. Defaults to the current dir")
+	flag.StringVar(&dir, "dir", getPwd(), "the directory to serve files from. Defaults to the pwd")
 	flag.Parse()
 	fmt.Println("dir=", dir)
 
@@ -132,7 +132,7 @@ func main() {
 	// header page
 	mux.HandleFunc("/header/list", listHeaders)
 	// FileServer
-	fs := http.FileServer(http.Dir(dir))
+	fs := http.FileServer(http.Dir(dir + "/static"))
 	mux.Handle("/static/", http.StripPrefix("/static", fs))
 	mux.HandleFunc("/plotly", plotly)
 
