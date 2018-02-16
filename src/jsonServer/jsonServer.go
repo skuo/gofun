@@ -132,9 +132,10 @@ func main() {
 	// header page
 	mux.HandleFunc("/header/list", listHeaders)
 	// FileServer
-	fs := http.FileServer(http.Dir(dir + "/static"))
-	mux.Handle("/static/", http.StripPrefix("/static", fs))
 	mux.HandleFunc("/plotly", plotly)
+	fs := http.FileServer(http.Dir(dir + "/static"))
+	fsWithoutGzipHandle := http.StripPrefix("/static", fs)
+	mux.Handle("/static/", fsWithoutGzipHandle)
 
 	fmt.Println("Starting http server")
 	if err := http.ListenAndServe(":4040", mux); err != nil {
