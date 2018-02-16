@@ -2,6 +2,7 @@ package curr1
 
 import (
 	"encoding/csv"
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -19,9 +20,26 @@ type CurrencyRequest struct {
 	Limit int    `json:limit`
 }
 
+func getPwd() string {
+	// find cwd and strip out /src/hello if necessary
+	pwd, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println(pwd)
+	index := strings.Index(pwd, "/src/jsonServer")
+	if index != -1 {
+		pwd = pwd[0:index]
+	}
+	return pwd
+}
+
+// Load current data
 func Load(path string) []Currency {
+	absPath := getPwd() + "/" + path
 	table := make([]Currency, 0)
-	file, err := os.Open(path)
+	file, err := os.Open(absPath)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -47,6 +65,7 @@ func Load(path string) []Currency {
 	return table
 }
 
+// Find the currencies
 func Find(table []Currency, filter string) []Currency {
 	if filter == "" || filter == "*" {
 		return table
