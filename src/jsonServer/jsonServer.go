@@ -63,6 +63,19 @@ func plotly(resp http.ResponseWriter, req *http.Request) {
 	io.Copy(resp, file)
 }
 
+// serves HTML scatter
+func scatter(resp http.ResponseWriter, req *http.Request) {
+	addCookie(resp, req)
+	path := getProjDir() + "/src/jsonServer/scatter.html"
+	file, err := os.Open(path)
+	if err != nil {
+		resp.WriteHeader(http.StatusInternalServerError)
+		fmt.Println(err)
+		return
+	}
+	io.Copy(resp, file)
+}
+
 func addCookie(resp http.ResponseWriter, req *http.Request) {
 	// add cookie
 	fmt.Println("Add testcookiename")
@@ -134,6 +147,7 @@ func main() {
 	mux.HandleFunc("/header/list", listHeaders)
 	// plotly
 	mux.HandleFunc("/plotly", plotly)
+	mux.HandleFunc("/scatter", scatter)
 	// FileServer
 	fs := http.FileServer(http.Dir(dir + "/static"))
 	fsWithoutGzHandle := http.StripPrefix("/static", fs)
