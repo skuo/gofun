@@ -37,7 +37,6 @@ func currs(resp http.ResponseWriter, req *http.Request) {
 
 // serves HTML gui
 func gui(resp http.ResponseWriter, req *http.Request) {
-	listCookies(req)
 	addCookie(resp, req)
 	path := getPwd() + "/src/jsonServer/currency.html"
 	file, err := os.Open(path)
@@ -50,18 +49,29 @@ func gui(resp http.ResponseWriter, req *http.Request) {
 }
 
 func addCookie(resp http.ResponseWriter, req *http.Request) {
-	// set cookies.
+	// add cookie
+	fmt.Println("Add testcookiename")
 	expire := time.Now().AddDate(0, 0, 1)
-	cookie := http.Cookie{Name: "testcookiename", Value: "testcookievalue", Expires: expire, MaxAge: 86400}
+	cookie := http.Cookie{Name: "testcookiename", Value: "testcookievalue", Path: "/", Expires: expire, MaxAge: 86400}
 
 	http.SetCookie(resp, &cookie)
 }
 
-func listCookies(req *http.Request) {
+func listCookies(resp http.ResponseWriter, req *http.Request) {
 	cookies := req.Cookies()
 	for _, cookie := range cookies {
-		fmt.Println("name=", cookie.Name, "value=", cookie.Value)
+		//fmt.Println("name=", cookie.Name, "value=", cookie.Value)
+		s := fmt.Sprintf("name=%s, value=%s", cookie.Name, cookie.Value)
+		io.WriteString(resp, s)
 	}
+}
+
+func deleteCookie(resp http.ResponseWriter, req *http.Request) {
+	// set cookie's MaxAge to -1
+	cookie := http.Cookie{Name: "testcookiename", Path: "/", MaxAge: -1}
+	http.SetCookie(resp, &cookie)
+
+	io.WriteString(resp, "cookie testcookiename deleted")
 }
 
 func getPwd() string {
@@ -82,10 +92,12 @@ func getPwd() string {
 func main() {
 	mux := http.NewServeMux()
 	// starting gui
-	mux.HandleFunc("/", gui)
+	mux.HandleFunc("/gui", gui)
 	// handle all variations under /currency/
 	mux.HandleFunc("/currency/", currs)
 	// cookie pages
+	mux.HandleFunc("/cookie/delete", deleteCookie)
+	mux.HandleFunc("/cookie/list", listCookies)
 
 	fmt.Println("Starting http server")
 	if err := http.ListenAndServe(":4040", mux); err != nil {
