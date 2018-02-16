@@ -5,12 +5,13 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"jsonServer/curr1"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 
-	"jsonServer/curr1"
+	"github.com/NYTimes/gziphandler"
 )
 
 var currencies = curr1.Load("data/curr1.csv")
@@ -131,11 +132,14 @@ func main() {
 	mux.HandleFunc("/cookie/list", listCookies)
 	// header page
 	mux.HandleFunc("/header/list", listHeaders)
-	// FileServer
+	// plotly
 	mux.HandleFunc("/plotly", plotly)
+	// FileServer
 	fs := http.FileServer(http.Dir(dir + "/static"))
-	fsWithoutGzipHandle := http.StripPrefix("/static", fs)
-	mux.Handle("/static/", fsWithoutGzipHandle)
+	fsWithoutGzHandle := http.StripPrefix("/static", fs)
+	//mux.Handle("/static/", fsWithoutGzHandle)
+	fsWithGzHandle := gziphandler.GzipHandler(fsWithoutGzHandle)
+	mux.Handle("/static/", fsWithGzHandle)
 
 	fmt.Println("Starting http server")
 	if err := http.ListenAndServe(":4040", mux); err != nil {
