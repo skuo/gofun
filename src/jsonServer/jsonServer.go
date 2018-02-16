@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"jsonServer/curr1"
 )
@@ -36,6 +37,8 @@ func currs(resp http.ResponseWriter, req *http.Request) {
 
 // serves HTML gui
 func gui(resp http.ResponseWriter, req *http.Request) {
+	listCookies(req)
+	addCookie(resp, req)
 	path := getPwd() + "/src/jsonServer/currency.html"
 	file, err := os.Open(path)
 	if err != nil {
@@ -44,6 +47,21 @@ func gui(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 	io.Copy(resp, file)
+}
+
+func addCookie(resp http.ResponseWriter, req *http.Request) {
+	// set cookies.
+	expire := time.Now().AddDate(0, 0, 1)
+	cookie := http.Cookie{Name: "testcookiename", Value: "testcookievalue", Expires: expire, MaxAge: 86400}
+
+	http.SetCookie(resp, &cookie)
+}
+
+func listCookies(req *http.Request) {
+	cookies := req.Cookies()
+	for _, cookie := range cookies {
+		fmt.Println("name=", cookie.Name, "value=", cookie.Value)
+	}
 }
 
 func getPwd() string {
@@ -63,9 +81,11 @@ func getPwd() string {
 
 func main() {
 	mux := http.NewServeMux()
+	// starting gui
 	mux.HandleFunc("/", gui)
 	// handle all variations under /currency/
 	mux.HandleFunc("/currency/", currs)
+	// cookie pages
 
 	fmt.Println("Starting http server")
 	if err := http.ListenAndServe(":4040", mux); err != nil {
