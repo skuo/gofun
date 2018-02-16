@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// Currency represents currency
 type Currency struct {
 	Code    string `json:"currency_code"`
 	Name    string `json:"currency_name"`
@@ -15,12 +16,13 @@ type Currency struct {
 	Country string `json:"currency_country"`
 }
 
+// CurrencyRequest currency request
 type CurrencyRequest struct {
 	Get   string `json:"get"`
-	Limit int    `json:limit`
+	Limit int    `json:"limit"`
 }
 
-func getPwd() string {
+func getProjDir() string {
 	// find cwd and strip out /src/hello if necessary
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -37,7 +39,7 @@ func getPwd() string {
 
 // Load current data
 func Load(path string) []Currency {
-	absPath := getPwd() + "/" + path
+	absPath := getProjDir() + "/" + path
 	table := make([]Currency, 0)
 	file, err := os.Open(absPath)
 	if err != nil {

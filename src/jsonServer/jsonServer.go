@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"net/http"
@@ -38,7 +39,20 @@ func currs(resp http.ResponseWriter, req *http.Request) {
 // serves HTML gui
 func gui(resp http.ResponseWriter, req *http.Request) {
 	addCookie(resp, req)
-	path := getPwd() + "/src/jsonServer/currency.html"
+	path := getProjDir() + "/src/jsonServer/currency.html"
+	file, err := os.Open(path)
+	if err != nil {
+		resp.WriteHeader(http.StatusInternalServerError)
+		fmt.Println(err)
+		return
+	}
+	io.Copy(resp, file)
+}
+
+// serves HTML plotly
+func plotly(resp http.ResponseWriter, req *http.Request) {
+	addCookie(resp, req)
+	path := getProjDir() + "/src/jsonServer/plotly.html"
 	file, err := os.Open(path)
 	if err != nil {
 		resp.WriteHeader(http.StatusInternalServerError)
@@ -61,7 +75,7 @@ func listCookies(resp http.ResponseWriter, req *http.Request) {
 	cookies := req.Cookies()
 	for _, cookie := range cookies {
 		//fmt.Println("name=", cookie.Name, "value=", cookie.Value)
-		s := fmt.Sprintf("name=%s, value=%s", cookie.Name, cookie.Value)
+		s := fmt.Sprintf("name=%s, value=%s\n", cookie.Name, cookie.Value)
 		io.WriteString(resp, s)
 	}
 }
@@ -82,14 +96,31 @@ func getPwd() string {
 		os.Exit(1)
 	}
 	fmt.Println(pwd)
-	index := strings.Index(pwd, "/src/jsonServer")
-	if index != -1 {
-		pwd = pwd[0:index]
-	}
 	return pwd
 }
 
+func getProjDir() string {
+	projDir := getPwd()
+	index := strings.Index(projDir, "/src/jsonServer")
+	if index != -1 {
+		projDir = projDir[0:index]
+	}
+	return projDir
+}
+
+func listHeaders(resp http.ResponseWriter, req *http.Request) {
+	for key, value := range req.Header {
+		io.WriteString(resp, fmt.Sprintf("%v: %v\n", key, value))
+	}
+}
+
 func main() {
+	var dir string
+
+	flag.StringVar(&dir, "dir", getPwd(), "the directory to serve files from. Defaults to the current dir")
+	flag.Parse()
+	fmt.Println("dir=", dir)
+
 	mux := http.NewServeMux()
 	// starting gui
 	mux.HandleFunc("/gui", gui)
@@ -98,6 +129,12 @@ func main() {
 	// cookie pages
 	mux.HandleFunc("/cookie/delete", deleteCookie)
 	mux.HandleFunc("/cookie/list", listCookies)
+	// header page
+	mux.HandleFunc("/header/list", listHeaders)
+	// FileServer
+	fs := http.FileServer(http.Dir(dir))
+	mux.Handle("/static/", http.StripPrefix("/static", fs))
+	mux.HandleFunc("/plotly", plotly)
 
 	fmt.Println("Starting http server")
 	if err := http.ListenAndServe(":4040", mux); err != nil {

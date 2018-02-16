@@ -13,3 +13,6 @@ https://www.golang-book.com/books/intro/9
 > go get github.com/derekparker/delve # this download but "go install" failed
 > cd ~/git/gofun/src/github.com/derekparker 
 > go install ./... # run "go install ./..." manually
+
+## Useful Code command
+> To format: shift-Option-F
