@@ -8,6 +8,7 @@ import (
 	"jsonServer/curr1"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -128,6 +129,21 @@ func listHeaders(resp http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func makeHandler(h http.Handler) http.HandlerFunc {
+	return func(resp http.ResponseWriter, req *http.Request) {
+		// Figure out the requrest filename
+		filename := filepath.Base(req.URL.Path)
+		fileExt := filepath.Ext(req.URL.Path)
+		fmt.Println("filename=", filename, "fileExt=", fileExt)
+		// Set some header.
+		if fileExt == ".gz" {
+			resp.Header().Add("Content-Enconding", "gzip")
+		}
+		// Serve with the actual handler.
+		h.ServeHTTP(resp, req)
+	}
+}
+
 func main() {
 	var dir string
 
@@ -150,10 +166,13 @@ func main() {
 	mux.HandleFunc("/scatter", scatter)
 	// FileServer
 	fs := http.FileServer(http.Dir(dir + "/static"))
-	fsWithoutGzHandle := http.StripPrefix("/static", fs)
+	// Gzip handles
+	fsWithoutGzHandler := http.StripPrefix("/static", fs)
 	//mux.Handle("/static/", fsWithoutGzHandle)
-	fsWithGzHandle := gziphandler.GzipHandler(fsWithoutGzHandle)
-	mux.Handle("/static/", fsWithGzHandle)
+	fsWithGzHandler := gziphandler.GzipHandler(fsWithoutGzHandler)
+	staticHandler := makeHandler(fsWithGzHandler)
+	//mux.Handle("/static/", fsWithGzHandler)
+	mux.Handle("/static/", staticHandler)
 
 	fmt.Println("Starting http server")
 	if err := http.ListenAndServe(":4040", mux); err != nil {
