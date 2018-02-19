@@ -1,0 +1,2 @@
+This is simple.txt.
+It's use to test serving up a text file and its gzipped version.

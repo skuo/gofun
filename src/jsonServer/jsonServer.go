@@ -5,10 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"jsonServer/curr1"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -77,6 +77,19 @@ func scatter(resp http.ResponseWriter, req *http.Request) {
 	io.Copy(resp, file)
 }
 
+// serves HTML scatter_gz
+func scatter_gz(resp http.ResponseWriter, req *http.Request) {
+	addCookie(resp, req)
+	path := getProjDir() + "/src/jsonServer/scatter_gz.html"
+	file, err := os.Open(path)
+	if err != nil {
+		resp.WriteHeader(http.StatusInternalServerError)
+		fmt.Println(err)
+		return
+	}
+	io.Copy(resp, file)
+}
+
 func addCookie(resp http.ResponseWriter, req *http.Request) {
 	// add cookie
 	fmt.Println("Add testcookiename")
@@ -129,18 +142,46 @@ func listHeaders(resp http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func makeHandler(h http.Handler) http.HandlerFunc {
+func simpleText(resp http.ResponseWriter, req *http.Request) {
+	http.ServeFile(resp, req, "simple.txt")
+}
+
+// serveFile causes the browser the download the file, not displaying the content
+func simpleTextJgz(resp http.ResponseWriter, req *http.Request) {
+	resp.Header().Add("Content-Enconding", "gzip")
+	resp.Header().Add("Content-Type", "text/plain; charset=utf-8")
+	http.ServeFile(resp, req, "simple.txt.jgz")
+}
+
+// This also cause the browser the download the file instead of display the content
+func simpleGzText(resp http.ResponseWriter, req *http.Request) {
+	resp.Header().Add("Content-Enconding", "gzip")
+	resp.Header().Add("Content-Type", "text/plain; charset=utf-8")
+	b, err := ioutil.ReadFile("simple.gz.txt")
+	if err != nil {
+		http.NotFound(resp, req)
+	}
+	resp.Write(b)
+}
+
+func makeHandler(withoutGzHandler http.Handler, withGzHandler http.Handler) http.HandlerFunc {
 	return func(resp http.ResponseWriter, req *http.Request) {
 		// Figure out the requrest filename
-		filename := filepath.Base(req.URL.Path)
-		fileExt := filepath.Ext(req.URL.Path)
-		fmt.Println("filename=", filename, "fileExt=", fileExt)
-		// Set some header.
-		if fileExt == ".gz" {
+		gzFullPath := getPwd() + req.URL.Path + ".gz"
+		fmt.Println("gzFullPath=", gzFullPath)
+		if _, err := os.Stat(gzFullPath); err == nil {
+			// Note.  This does not work.  The content is still gzipped (or even double gzipped)
+			// A pre gzipped file exists.  Change req.URL.Path, set header and serve
+			req.URL.Path = req.URL.Path + ".gz"
 			resp.Header().Add("Content-Enconding", "gzip")
+			resp.Header().Add("Content-Type", "text/csv; charset=utf-8")
+			//resp.Header().Add("vary", "Accept-Encoding")
+			//resp.Header().Add("Transfer-Encoding", "chunked") // chunked
+			withoutGzHandler.ServeHTTP(resp, req)
+		} else {
+			// gzip on the fly
+			withGzHandler.ServeHTTP(resp, req)
 		}
-		// Serve with the actual handler.
-		h.ServeHTTP(resp, req)
 	}
 }
 
@@ -161,16 +202,21 @@ func main() {
 	mux.HandleFunc("/cookie/list", listCookies)
 	// header page
 	mux.HandleFunc("/header/list", listHeaders)
+	// simple
+	mux.HandleFunc("/simpleText", simpleText)
+	mux.HandleFunc("/simpleTextJgz", simpleTextJgz)
+	mux.HandleFunc("/simpleGzText", simpleGzText)
 	// plotly
 	mux.HandleFunc("/plotly", plotly)
 	mux.HandleFunc("/scatter", scatter)
+	mux.HandleFunc("/scatter_gz", scatter_gz)
 	// FileServer
 	fs := http.FileServer(http.Dir(dir + "/static"))
 	// Gzip handles
 	fsWithoutGzHandler := http.StripPrefix("/static", fs)
 	//mux.Handle("/static/", fsWithoutGzHandle)
 	fsWithGzHandler := gziphandler.GzipHandler(fsWithoutGzHandler)
-	staticHandler := makeHandler(fsWithGzHandler)
+	staticHandler := makeHandler(fsWithoutGzHandler, fsWithGzHandler)
 	//mux.Handle("/static/", fsWithGzHandler)
 	mux.Handle("/static/", staticHandler)
 
