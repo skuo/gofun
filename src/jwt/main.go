@@ -5,9 +5,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
+	"time"
 
+	"github.com/auth0/go-jwt-middleware"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
+
+// NotImplemented returns the message "Not Implemented" whenever an API endpoint is hit
+var NotImplemented = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Not Implemented"))
+})
 
 // Product contain information about VR experiences
 type Product struct {
@@ -42,10 +52,10 @@ var ProductsHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Reque
 	w.Write([]byte(payload))
 })
 
-/* The feedback handler will add either positive or negative feedback to the product
-   We would normally save this data to the database - but for this demo we'll fake it
-   so that as long as the request is successful and we can match a product to our catalog of products
-   we'll return an OK status. */
+// AddFeedbackHandler adds wither positive or negative feedback to the product.
+/* We would normally save this data to the database - but for this demo we'll fake it
+so that as long as the request is successful and we can match a product to our catalog of products
+we'll return an OK status. */
 var AddFeedbackHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	var product Product
 	vars := mux.Vars(r)
@@ -67,6 +77,37 @@ var AddFeedbackHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Re
 	}
 })
 
+/* Set up a global string for our secret */
+var mySigningKey = []byte("secret")
+
+// GetTokenHandler Handlers
+var GetTokenHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	/* Create the token */
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	/* Create a map to store our claims */
+	claims := token.Claims.(jwt.MapClaims)
+
+	/* Set token claims */
+	claims["admin"] = true
+	claims["name"] = "Ado Kukic"
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+
+	/* Sign the token with our secret */
+	tokenString, _ := token.SignedString(mySigningKey)
+
+	/* Finally, write the token to the browser window */
+	w.Write([]byte(tokenString))
+})
+
+// JwtMiddleware is from auth0.  It verifies the JWT token
+var JwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
+	ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
+		return mySigningKey, nil
+	},
+	SigningMethod: jwt.SigningMethodHS256,
+})
+
 func main() {
 	// Here we are instantiating the gorilla/mux router
 	r := mux.NewRouter()
@@ -84,12 +125,11 @@ func main() {
 	r.Handle("/products", ProductsHandler).Methods("GET")
 	r.Handle("/products/{slug}/feedback", AddFeedbackHandler).Methods("POST")
 
-	fmt.Println("Starting http server")
-	// Our application will run on port 3000. Here we declare the port and pass in our router.
-	http.ListenAndServe(":3000", r)
-}
+	// JWT endpoint
+	r.Handle("/get-token", GetTokenHandler).Methods("GET")
 
-// NotImplemented returns the message "Not Implemented" whenever an API endpoint is hit
-var NotImplemented = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Not Implemented"))
-})
+	// Our application will run on port 3000. Here we declare the port and pass in our router.
+	// Wrap the LoggingHandler function around our router so that the logger is called first on each route request
+	fmt.Println("Starting http server")
+	http.ListenAndServe(":3000", handlers.LoggingHandler(os.Stdout, r))
+}
