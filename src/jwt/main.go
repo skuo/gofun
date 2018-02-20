@@ -61,6 +61,15 @@ var AddFeedbackHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Re
 	vars := mux.Vars(r)
 	slug := vars["slug"]
 
+	token, _ := jwtmiddleware.FromAuthHeader(r)
+	//fmt.Println("token=", token)
+	// Now parse the token
+	parsedToken, _ := jwt.Parse(token, JwtMiddleware.Options.ValidationKeyGetter)
+	//fmt.Println("parsedToken=", parsedToken)
+	for k, v := range parsedToken.Claims.(jwt.MapClaims) {
+		fmt.Printf("claim %s :\t%#v\n", k, v)
+	}
+
 	for _, p := range products {
 		if p.Slug == slug {
 			product = p
@@ -90,7 +99,7 @@ var GetTokenHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Reque
 
 	/* Set token claims */
 	claims["admin"] = true
-	claims["name"] = "Ado Kukic"
+	claims["name"] = "Beyond Limits"
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
 	/* Sign the token with our secret */
