@@ -95,6 +95,7 @@ var GetTokenHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Reque
 
 	/* Sign the token with our secret */
 	tokenString, _ := token.SignedString(mySigningKey)
+	fmt.Println(tokenString)
 
 	/* Finally, write the token to the browser window */
 	w.Write([]byte(tokenString))
@@ -121,9 +122,11 @@ func main() {
 	// /status - which we will call to make sure that our API is up and running
 	// /products - which will retrieve a list of products that the user can leave feedback on
 	// /products/{slug}/feedback - which will capture user feedback on products
-	r.Handle("/status", StatusHandler).Methods("GET")
-	r.Handle("/products", ProductsHandler).Methods("GET")
-	r.Handle("/products/{slug}/feedback", AddFeedbackHandler).Methods("POST")
+	//r.Handle("/status", StatusHandler).Methods("GET")
+	r.Handle("/status", NotImplemented).Methods("GET")
+	/* We will add the middleware to our products and feedback routes. The status route will be publicly accessible */
+	r.Handle("/products", JwtMiddleware.Handler(ProductsHandler)).Methods("GET")
+	r.Handle("/products/{slug}/feedback", JwtMiddleware.Handler(AddFeedbackHandler)).Methods("POST")
 
 	// JWT endpoint
 	r.Handle("/get-token", GetTokenHandler).Methods("GET")
