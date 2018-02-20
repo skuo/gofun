@@ -60,16 +60,16 @@ var AddFeedbackHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Re
 	var product Product
 	vars := mux.Vars(r)
 	slug := vars["slug"]
-
-	token, _ := jwtmiddleware.FromAuthHeader(r)
-	//fmt.Println("token=", token)
-	// Now parse the token
-	parsedToken, _ := jwt.Parse(token, JwtMiddleware.Options.ValidationKeyGetter)
-	//fmt.Println("parsedToken=", parsedToken)
-	for k, v := range parsedToken.Claims.(jwt.MapClaims) {
-		fmt.Printf("claim %s :\t%#v\n", k, v)
-	}
-
+	/*
+		token, _ := jwtmiddleware.FromAuthHeader(r)
+		//fmt.Println("token=", token)
+		// Now parse the token
+		parsedToken, _ := jwt.Parse(token, JwtMiddleware.Options.ValidationKeyGetter)
+		//fmt.Println("parsedToken=", parsedToken)
+		for k, v := range parsedToken.Claims.(jwt.MapClaims) {
+			fmt.Printf("claim %s :\t%#v\n", k, v)
+		}
+	*/
 	for _, p := range products {
 		if p.Slug == slug {
 			product = p
@@ -118,6 +118,31 @@ var JwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
 	SigningMethod: jwt.SigningMethodHS256,
 })
 
+// AuthorizationHandler authorize access to an API endpoint
+var AuthorizationHandler = func(h http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		token, err := jwtmiddleware.FromAuthHeader(r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if token != "" {
+			//fmt.Println("token=", token)
+			// Now parse the token
+			parsedToken, _ := jwt.Parse(token, JwtMiddleware.Options.ValidationKeyGetter)
+			//fmt.Println("parsedToken=", parsedToken)
+			for k, v := range parsedToken.Claims.(jwt.MapClaims) {
+				fmt.Printf("claim %s :\t%#v\n", k, v)
+			}
+			fmt.Print("\n")
+		} else {
+			fmt.Println("No JWT token.  Should redirect to login page")
+		}
+		// Serve with the actual handler.
+		h.ServeHTTP(w, r)
+	}
+}
+
 func main() {
 	// Here we are instantiating the gorilla/mux router
 	r := mux.NewRouter()
@@ -132,10 +157,10 @@ func main() {
 	// /products - which will retrieve a list of products that the user can leave feedback on
 	// /products/{slug}/feedback - which will capture user feedback on products
 	//r.Handle("/status", StatusHandler).Methods("GET")
-	r.Handle("/status", NotImplemented).Methods("GET")
+	r.Handle("/status", AuthorizationHandler(NotImplemented)).Methods("GET")
 	/* We will add the middleware to our products and feedback routes. The status route will be publicly accessible */
-	r.Handle("/products", JwtMiddleware.Handler(ProductsHandler)).Methods("GET")
-	r.Handle("/products/{slug}/feedback", JwtMiddleware.Handler(AddFeedbackHandler)).Methods("POST")
+	r.Handle("/products", JwtMiddleware.Handler(AuthorizationHandler(ProductsHandler))).Methods("GET")
+	r.Handle("/products/{slug}/feedback", JwtMiddleware.Handler(AuthorizationHandler(AddFeedbackHandler))).Methods("POST")
 
 	// JWT endpoint
 	r.Handle("/get-token", GetTokenHandler).Methods("GET")
