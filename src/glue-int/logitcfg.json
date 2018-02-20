@@ -1,0 +1,14 @@
+
+{
+    "SystemID": "local",
+    "filename": "logfile.txt",
+    "url": "",
+    "stdout": true,
+    "level": "DEBUG",
+    "debugFlags": [
+        { "pkg": "main", "file": "" }
+    ],
+    "xFlags": [
+        { "pkg": "main", "file": "main", "flags": "3" }
+    ]
+}
