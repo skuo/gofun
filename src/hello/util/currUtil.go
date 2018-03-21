@@ -69,7 +69,7 @@ func Print() {
 }
 
 func Sort() {
-    fmt.Println("... Sort() ")
+	fmt.Println("... Sort() ")
 	N := len(constant.Currencies)
 	for i := 0; i < N-1; i++ {
 		currMin := i

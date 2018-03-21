@@ -1,10 +1,10 @@
 package util
 
 import (
-    "bufio"
-    "bytes"
-    "fmt"
-    "os"
+	"bufio"
+	"bytes"
+	"fmt"
+	"os"
 )
 
 // =========================
@@ -66,7 +66,7 @@ func reduceWords(tuples [][]string) map[string][]string {
 }
 
 func TryAnagram() {
-    	// anagram
+	// anagram
 	tuples := mapWords("data/anagram_dict.txt", bySigKv)
 	anagrams := reduceWords(tuples)
 	for k, v := range anagrams {
