@@ -14,7 +14,9 @@ output/
 **/*.pb
 **/*.csv*
 
+src/auth0/
 src/github.com/
 src/golang.org/
+src/gopkg.in/
 src/sourcegraph.com/
 src/glue/converter/csv2Pb_test.go
