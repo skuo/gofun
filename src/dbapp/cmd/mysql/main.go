@@ -27,6 +27,7 @@ func main() {
 	checkErr(err)
 
 	fmt.Println(id)
+
 	// update
 	stmt, err = db.Prepare("update userinfo set username=? where uid=?")
 	checkErr(err)
