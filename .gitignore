@@ -6,6 +6,9 @@ bin/
 pkg/
 output/
 
+# command binaries
+mysql
+
 *~
 .idea/
 .vscode/
