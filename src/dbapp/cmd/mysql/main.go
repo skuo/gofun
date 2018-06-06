@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	db, err := sql.Open("mysql", "astaxie:astaxie@/test?charset=utf8")
+	db, err := sql.Open("mysql", "dbuser:dbpassword@/devdb?charset=utf8")
 	checkErr(err)
 
 	// insert
