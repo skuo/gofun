@@ -6,8 +6,9 @@ bin/
 pkg/
 output/
 
-# command binaries
+# command binaries: ignore file mysql but not dir mysql/
 mysql
+!mysql/
 
 *~
 .idea/

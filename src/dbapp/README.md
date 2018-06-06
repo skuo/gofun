@@ -22,6 +22,7 @@ docker pull mysql/mysql-server:latest
 ```bash
 # create a docker volume
 docker volume create mysql-volume
+
 # This sets root password, creates debdb, dbuser/dbpassword in the docker volume
 docker run -d --name=mysql-server -e MYSQL_ROOT_PASSWORD=my-secret-pw -e MYSQL_DATABASE=devdb -e MYSQL_USER=dbuser -e MYSQL_PASSWORD=dbpassword --mount type=volume,src=mysql-volume,dst=/var/lib/mysql -p 3306:3306 mysql/mysql-server:latest
 
