@@ -10,6 +10,11 @@ import (
 func main() {
 	db, err := sql.Open("mysql", "dbuser:dbpassword@/devdb?charset=utf8")
 	checkErr(err)
+	defer db.Close()
+
+	// ping
+	err = db.Ping()
+	checkErr(err)
 
 	// insert
 	stmt, err := db.Prepare("INSERT userinfo SET username=?,departname=?,created=?")
@@ -37,6 +42,7 @@ func main() {
 	// query
 	rows, err := db.Query("SELECT * FROM userinfo")
 	checkErr(err)
+	defer rows.Close()
 
 	for rows.Next() {
 		var uid int
@@ -50,6 +56,9 @@ func main() {
 		fmt.Println(department)
 		fmt.Println(created)
 	}
+	// check error at the end of for rows.next() to avoid calling rows.Close() inducing a runtime panic
+	err = rows.Err()
+	checkErr(err)
 
 	// delete
 	stmt, err = db.Prepare("delete from userinfo where uid=?")
@@ -62,8 +71,6 @@ func main() {
 	checkErr(err)
 
 	fmt.Println(affect)
-
-	db.Close()
 
 }
 
