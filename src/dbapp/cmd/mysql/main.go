@@ -8,6 +8,10 @@ import (
 )
 
 func main() {
+	// mysql driver supports the following connection string
+	// user:password@tcp(localhost:5555)/dbname?charset=utf8
+	// user:password@/dbname
+	// user:password@tcp([de:ad:be:ef::ca:fe]:80)/dbname
 	db, err := sql.Open("mysql", "dbuser:dbpassword@/devdb?charset=utf8")
 	checkErr(err)
 	defer db.Close()
