@@ -8,5 +8,5 @@ Go's database/sql provides very low level APIs that requires a new connection an
 
 ```bash
 # to build all cmds
-> go build ./...
+go build ./...
 ```
