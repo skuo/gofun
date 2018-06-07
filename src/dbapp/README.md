@@ -10,9 +10,23 @@ http://go-database-sql.org/index.html
 
 ## build
 
+From https://ieftimov.com/golang-package-multiple-binaries. 
+
+If we see Go’s documentation on the go build command, we will find this segment:
+
+When compiling a single main package, build writes the resulting executable to an output file named after the first source file (‘go build ed.go rx.go’ writes ‘ed’ or ‘ed.exe’) or the source code directory (‘go build unix/sam’ writes ‘sam’ or ‘sam.exe’). The ‘.exe’ suffix is added when writing a Windows executable.
+
+Also, this:
+
+When compiling multiple packages or a single non-main package, build compiles the packages but discards the resulting object, serving only as a check that the packages can be built.
+
 ```bash
-# to build all cmds
-go build ./...
+# to build a command
+cd cmd/mysql
+go build # mysql executible is in cmd/mysql/
+
+# go install can and does install all commands
+go install ./...
 ```
 
 ## MySql Implementation
