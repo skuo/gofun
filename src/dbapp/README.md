@@ -53,3 +53,8 @@ docker run -d --name=mysql-server --mount type=volume,src=mysql-volume,dst=/var/
 # Use an docker.env file
 docker run -d --name=mysql-server --env-file docker.env --mount type=volume,src=mysql-volume,dst=/var/lib/mysql -p 3306:3306 mysql/mysql-server:latest
 ```
+
+## Sqlite Implementation
+
+Sqlite is an embedded database. All codes needed to create a database, table and execute all DML operations are contained in cmd/sqlite/main.go.
+
