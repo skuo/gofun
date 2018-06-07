@@ -60,3 +60,21 @@ Sqlite is an embedded database. All codes needed to create a database, table and
 
 ## Postgres Implementation
 
+### Start and Mount a Docker Volume for Persistence
+```bash
+# create a docker volume
+docker volume create postgres-volume
+
+# start postgres
+docker run -d --name postgres-server -e POSTGRES_PASSWORD=my-secret-pw --mount type=volume,src=postgres-volume,dst=/var/lib/postgresql/data  -p 5432:5432 postgres:latest
+```
+
+### Create devuser and devdb
+```bash
+# attach to the running postgres docker proces
+docker exec -it postgres-server psql -U postgres
+
+# Create dev user and db
+$ CREATE ROLE devuser WITH LOGIN PASSWORD 'devpassword' VALID UNTIL 'infinity';
+$ CREATE DATABASE devdb WITH ENCODING='UTF8' OWNER=devuser CONNECTION LIMIT=-1;
+```
