@@ -9,6 +9,7 @@ output/
 # command binaries: ignore file mysql but not dir mysql/
 mysql
 !mysql/
+src/dbapp/cmd/postgres/postgres
 
 *~
 .idea/
